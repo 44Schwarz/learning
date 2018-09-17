@@ -18,10 +18,12 @@ class Car(Vehicle):
         super().__init__(brand=brand, photo_file_name=photo_file_name, carrying=carrying)
         self.passenger_seats_count = passenger_seats_count
 
+
 class Truck(Vehicle):
     def __init__(self, brand, photo_file_name, carrying, body_whl):
         super().__init__(brand=brand, photo_file_name=photo_file_name, carrying=carrying)
-        self.body_length, self.body_width, self.body_height = [float(part) for part in  body_whl.split('x')] if body_whl else (0.0, 0.0, 0.0)
+        self.body_length, self.body_width, self.body_height = [float(part) for part in body_whl.split('x')] \
+            if body_whl else (0.0, 0.0, 0.0)
 
     def get_body_volume(self):
         return self.body_length * self.body_width * self.body_height    
@@ -40,16 +42,20 @@ def get_car_list(csv_filename):
         reader = csv.reader(f, delimiter=';')
         next(reader)
         for row in reader:
-            print(row)
-
+            if row:
+                try:
+                    if row[0] == 'car':
+                        car_list.append(Car(brand=row[1], photo_file_name=row[3], carrying=float(row[5]),
+                                            passenger_seats_count=int(row[2])))
+                    elif row[0] == 'truck':
+                        car_list.append(Truck(brand=row[1], photo_file_name=row[3], carrying=float(row[5]), 
+                                              body_whl=row[4]))
+                    elif row[0] == 'spec_machine':
+                        car_list.append(SpecMachine(brand=row[1], photo_file_name=row[3], carrying=float(row[5]), 
+                                                    extra=row[6]))
+                except IndexError:
+                    pass
     return car_list
 
 
-c1 = Car('brand', 'photo', 43, 4)
-c2 = Truck('br', 'ph', 443, '2x4x0.5')
-c3 = SpecMachine('ef', 'gw', 245, 546)
-# print(c1.car_type, c1.brand, c1.photo_file_name, c1.carrying)
-# print(c2.car_type, c2.body_length, c2.body_width, c2.body_height, c2.get_body_volume())
-# print(c3.car_type)
-get_car_list('cars.csv')
-
+print(get_car_list('cars.csv')[1].get_body_volume())
